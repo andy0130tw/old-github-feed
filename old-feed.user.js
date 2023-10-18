@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Old Feed
 // @namespace    https://gerritbirkeland.com/
-// @version      0.13-fork
+// @version      0.13
 // @description  Restores the Following/For You buttons to let you pick your own feed
 // @author       Gerrit Birkeland
 // @match        https://github.com/
@@ -71,12 +71,10 @@
       font-size: 24px;
       text-align: center;
       padding: 40px 0 100px;
-      opacity: 1;
       transition: opacity 150ms ease-out;
       background: linear-gradient(0deg, transparent, var(--bgColor-default, var(--color-canvas-inset)) 60%);`
 		loadingIndicator.textContent = 'Loading...'
     news.style.position = 'relative'
-    news.querySelector('.news > *:last-child').style.opacity = .75
     news.insertBefore(loadingIndicator, feedContainer)
   
     const tabs = { following: followingFeedWrapper, forYou: feedContainer };
@@ -107,11 +105,16 @@
     }, 60000);
 
     async function fetchDashboard() {
+        // !!!
+        const getContentArea = () => news.querySelector('.news > *:last-child')
+        loadingIndicator.style.opacity = 1;
+        getContentArea().style.opacity = .6
+      
         const r = await fetch(`https://github.com/dashboard-feed?page=1`, { headers: { "X-Requested-With": "XMLHttpRequest" } })
         const html = await r.text()
         
         // !!!
-        news.querySelector('.news > *:last-child').style.opacity = 1;
+        getContentArea().style.opacity = 1;
         loadingIndicator.style.opacity = 0;
         // loadingIndicator.textContent = "";
       
