@@ -66,14 +66,22 @@
   	// !!!
     const loadingIndicator = document.createElement('div') // picker.querySelector(".loader");
     loadingIndicator.style = `position: absolute;
-      top: 0; left: 0; right: 0; z-index: 9999;
+      top: 0; left: 0; right: 0; z-index: 998;
       pointer-events: none;
       font-size: 24px;
       text-align: center;
-      padding: 40px 0 100px;
+      padding: 16px 0 96px;
       transition: opacity 150ms ease-out;
-      background: linear-gradient(0deg, transparent, var(--bgColor-default, var(--color-canvas-inset)) 60%);`
-		loadingIndicator.textContent = 'Loading...'
+      background: linear-gradient(0deg, transparent, var(--bgColor-default, var(--color-canvas-inset)) 60%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;`
+		loadingIndicator.innerHTML = `
+      <picture>
+        <img style="width: 48px; display: block" src="https://github.githubassets.com/assets/mona-loading-dimmed-5da225352fd7.gif">
+      </picture>
+      <div>Loading...</div>`
     news.style.position = 'relative'
     news.insertBefore(loadingIndicator, feedContainer)
   
