@@ -22,9 +22,9 @@
 
     const columnContainer = document.querySelector(".feed-content");
     columnContainer.classList.remove("flex-justify-center");
-    columnContainer.style.maxWidth = "100vw";
+    columnContainer.style.width = "fit-content";
     const feedColumn = columnContainer.querySelector(".feed-main");
-    feedColumn.style.maxWidth = "100vw";
+    feedColumn.style.maxWidth = "96ex";
 
     if (feedColumn.children.length != 2) {
         console.warn("[Old Feed] Page does not have expected structure, please report an issue");
@@ -85,6 +85,9 @@
     news.style.position = 'relative'
     news.insertBefore(loadingIndicator, feedContainer)
   
+  	//feedContainer.nextElementSibling.style.margin = '0 auto'
+    //feedContainer.nextElementSibling.style.maxWidth = '108ex'
+  
     const tabs = { following: followingFeedWrapper, forYou: feedContainer };
     picker.addEventListener("click", event => {
         if (event.target.tagName !== "A") return;
@@ -115,7 +118,7 @@
     async function fetchDashboard() {
         // !!!
         const getContentArea = () => news.querySelector('.news > *:last-child')
-        loadingIndicator.style.opacity = 1;
+        loadingIndicator.style.opacity = .8
         getContentArea().style.opacity = .6
       
         const r = await fetch(`https://github.com/dashboard-feed?page=1`, { headers: { "X-Requested-With": "XMLHttpRequest" } })
