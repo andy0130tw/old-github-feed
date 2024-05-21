@@ -22,9 +22,9 @@
 
     const columnContainer = document.querySelector(".feed-content");
     columnContainer.classList.remove("flex-justify-center");
-    columnContainer.style.width = "fit-content";
+    columnContainer.style.maxWidth = "100vw";
     const feedColumn = columnContainer.querySelector(".feed-main");
-    feedColumn.style.maxWidth = "96ex";
+    feedColumn.style.maxWidth = "100vw";
 
     if (feedColumn.children.length != 2) {
         console.warn("[Old Feed] Page does not have expected structure, please report an issue");
@@ -34,6 +34,7 @@
     const news = document.querySelector("#dashboard .news");
 
     const followingFeedWrapper = document.createElement("div");
+    // FIXME: 
     followingFeedWrapper.innerHTML = localStorage.getItem("dashboardCache") || "";
     news.appendChild(followingFeedWrapper);
 
@@ -66,7 +67,7 @@
   	// !!!
     const loadingIndicator = document.createElement('div') // picker.querySelector(".loader");
     loadingIndicator.style = `position: absolute;
-      top: 0; left: 0; right: 0; z-index: 998;
+      top: 0; left: 0; right: 0; z-index: 99;
       pointer-events: none;
       font-size: 24px;
       text-align: center;
@@ -84,9 +85,6 @@
       <div>Loading...</div>`
     news.style.position = 'relative'
     news.insertBefore(loadingIndicator, feedContainer)
-  
-  	//feedContainer.nextElementSibling.style.margin = '0 auto'
-    //feedContainer.nextElementSibling.style.maxWidth = '108ex'
   
     const tabs = { following: followingFeedWrapper, forYou: feedContainer };
     picker.addEventListener("click", event => {
@@ -118,7 +116,7 @@
     async function fetchDashboard() {
         // !!!
         const getContentArea = () => news.querySelector('.news > *:last-child')
-        loadingIndicator.style.opacity = .8
+        loadingIndicator.style.opacity = 1;
         getContentArea().style.opacity = .6
       
         const r = await fetch(`https://github.com/dashboard-feed?page=1`, { headers: { "X-Requested-With": "XMLHttpRequest" } })
@@ -128,6 +126,9 @@
         getContentArea().style.opacity = 1;
         loadingIndicator.style.opacity = 0;
         // loadingIndicator.textContent = "";
+      
+        // !!!
+        if (followingFeedWrapper == null) return
       
         followingFeedWrapper.innerHTML = html;
         followingFeedWrapper.querySelector(".ajax-pagination-btn").addEventListener("click", () => {
