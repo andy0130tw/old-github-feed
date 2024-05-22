@@ -2,6 +2,8 @@
 // @name         Old Feed
 // @namespace    https://gerritbirkeland.com/
 // @version      0.13
+// @updateURL    https://raw.githubusercontent.com/Gerrit0/old-github-feed/main/old-feed.user.js
+// @downloadURL  https://raw.githubusercontent.com/Gerrit0/old-github-feed/main/old-feed.user.js
 // @description  Restores the Following/For You buttons to let you pick your own feed
 // @author       Gerrit Birkeland
 // @match        https://github.com/
@@ -9,9 +11,6 @@
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=github.com
 // @grant        none
 // ==/UserScript==
-
-// @updateURL    https://raw.githubusercontent.com/andy0130tw/old-github-feed/main/old-feed.user.js
-// @downloadURL  https://raw.githubusercontent.com/Gerrit0/old-github-feed/main/old-feed.user.js
 
 (function () {
     "use strict";
@@ -33,9 +32,12 @@
 
     const news = document.querySelector("#dashboard .news");
 
+    // XXX: not sure if this way works on every account
+    const githubUid = document.querySelector('meta[name="octolytics-actor-id"]')?.content || '?'
+    const dashboardCacheStorageKey = `dashboardCache:${githubUid}`
+  
     const followingFeedWrapper = document.createElement("div");
-    // FIXME: 
-    followingFeedWrapper.innerHTML = localStorage.getItem("dashboardCache") || "";
+    followingFeedWrapper.innerHTML = localStorage.getItem(dashboardCacheStorageKey) || "";
     news.appendChild(followingFeedWrapper);
 
     const picker = document.createElement("div");
@@ -127,15 +129,12 @@
         loadingIndicator.style.opacity = 0;
         // loadingIndicator.textContent = "";
       
-        // !!!
-        if (followingFeedWrapper == null) return
-      
         followingFeedWrapper.innerHTML = html;
-        followingFeedWrapper.querySelector(".ajax-pagination-btn").addEventListener("click", () => {
+        followingFeedWrapper.querySelector(".ajax-pagination-btn")?.addEventListener("click", () => {
             userHasLoadedMore = true;
         });
         // Apply pretty paddings for feeds.
-        followingFeedWrapper.querySelector(".body .py-4").style.setProperty('padding-top', 'var(--base-size-4, 4px)', 'important');
+        followingFeedWrapper.querySelector(".body .py-4")?.style.setProperty('padding-top', 'var(--base-size-4, 4px)', 'important');
         followingFeedWrapper.querySelectorAll(".body .py-4").forEach((e) => {
             e.classList.remove("py-4");
             e.classList.add("py-3");
@@ -161,6 +160,6 @@
             }
         });
         // Saving the edited content for the cache.
-        localStorage.setItem("dashboardCache", followingFeedWrapper.innerHTML);
+        localStorage.setItem(dashboardCacheStorageKey, followingFeedWrapper.innerHTML);
     }
 })();
