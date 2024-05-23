@@ -35,16 +35,19 @@
     // XXX: not sure if this way works on every account
     const githubUid = document.querySelector('meta[name="octolytics-actor-id"]')?.content || '?'
     const dashboardCacheStorageKey = `dashboardCache:${githubUid}`
-  
+
     const followingFeedWrapper = document.createElement("div");
     followingFeedWrapper.innerHTML = localStorage.getItem(dashboardCacheStorageKey) || "";
     news.appendChild(followingFeedWrapper);
 
-    const picker = document.createElement("div");
-    news.insertBefore(picker, feedContainer);
     // !!!
+    const existingPicker = document.querySelector('#old-feed-picker');
+    const picker = existingPicker ?? document.createElement("div");
+    if (existingPicker == null) {
+      news.insertBefore(picker, feedContainer);
+    }
     picker.innerHTML = `
-        <div class="mb-3">
+        <div class="mb-3" id="old-feed-picker">
             <nav class="overflow-hidden UnderlineNav">
                 <ul class="UnderlineNav-body">
                     <li class="d-inline-flex">
@@ -67,7 +70,7 @@
         </div>
     `;
 
-  	// !!!
+    // !!!
     const loadingIndicator = document.createElement('div') // picker.querySelector(".loader");
 
     // FIXME: which variable is for background color of ".feed-background" depends on theme;
@@ -84,14 +87,14 @@
       align-items: center;
       justify-content: center;
       gap: 16px;`
-		loadingIndicator.innerHTML = `
+    loadingIndicator.innerHTML = `
       <picture>
         <img style="width: 48px; display: block" src="https://github.githubassets.com/assets/mona-loading-dimmed-5da225352fd7.gif">
       </picture>
       <div>Loading...</div>`
     news.style.position = 'relative'
     news.insertBefore(loadingIndicator, feedContainer)
-  
+
     const tabs = { following: followingFeedWrapper, forYou: feedContainer };
     picker.addEventListener("click", event => {
         if (event.target.tagName !== "A") return;
