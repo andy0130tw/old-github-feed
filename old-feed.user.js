@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Old Feed
 // @namespace    https://gerritbirkeland.com/
-// @version      0.13
+// @version      0.14
 // @updateURL    https://raw.githubusercontent.com/Gerrit0/old-github-feed/main/old-feed.user.js
 // @downloadURL  https://raw.githubusercontent.com/Gerrit0/old-github-feed/main/old-feed.user.js
-// @description  Restores the Following/For You buttons to let you pick your own feed
+// @description  Restores the Following/For You buttons to let you pick your feed
 // @author       Gerrit Birkeland
 // @match        https://github.com/
 // @match        https://github.com/dashboard
@@ -16,7 +16,7 @@
     "use strict";
 
     const feedContainer = document.querySelector("#dashboard feed-container");
-    // Apparently if this isn't true, then a SSO popup is being shown, so don't do anything.
+    // Apparently if this isn't true, then an SSO popup is being shown, so don't do anything.
     if (!feedContainer) return;
 
     const columnContainer = document.querySelector(".feed-content");
@@ -42,8 +42,9 @@
 
     const picker = document.createElement("div");
     news.insertBefore(picker, feedContainer);
+    // !!!
     picker.innerHTML = `
-        <div class="mb-3" style="display: none !important;">
+        <div class="mb-3">
             <nav class="overflow-hidden UnderlineNav">
                 <ul class="UnderlineNav-body">
                     <li class="d-inline-flex">
@@ -57,7 +58,7 @@
                         </a>
                     </li>
                 </ul>
-                <ul class="UnderlineNav-body">
+                <ul class="UnderlineNav-body" style="display: none !important;">
                     <li class="d-inline-flex">
                         <span class="loader">Loading...</span>
                     </li>
@@ -108,7 +109,7 @@
     let userHasLoadedMore = false;
     fetchDashboard();
 
-    // GitHub updated the feed every minute unless the user has loaded more, so we'll do the same.
+    // GitHub updates the feed every minute unless the user has loaded more, so we'll do the same.
     setInterval(() => {
         if (userHasLoadedMore === false) {
             fetchDashboard();
@@ -119,16 +120,16 @@
         // !!!
         const getContentArea = () => news.querySelector('.news > *:last-child')
         loadingIndicator.style.opacity = 1;
-        getContentArea().style.opacity = .6
-      
+        getContentArea().style.opacity = .6;
+
         const r = await fetch(`https://github.com/dashboard-feed?page=1`, { headers: { "X-Requested-With": "XMLHttpRequest" } })
         const html = await r.text()
-        
+
         // !!!
         getContentArea().style.opacity = 1;
         loadingIndicator.style.opacity = 0;
         // loadingIndicator.textContent = "";
-      
+
         followingFeedWrapper.innerHTML = html;
         followingFeedWrapper.querySelector(".ajax-pagination-btn")?.addEventListener("click", () => {
             userHasLoadedMore = true;
@@ -138,6 +139,18 @@
         followingFeedWrapper.querySelectorAll(".body .py-4").forEach((e) => {
             e.classList.remove("py-4");
             e.classList.add("py-3");
+        });
+        // Apply the same foreground color for texts.
+        followingFeedWrapper.querySelectorAll(".body > div > div > div.color-fg-muted").forEach((e) => {
+            if (!e.nextElementSibling) {
+                e.querySelector("div").classList.add("color-fg-default");
+            }
+        });
+        // Apply box for non-boxed items.
+        followingFeedWrapper.querySelectorAll(".body > .d-flex > .d-flex > div > div[class=color-fg-default]").forEach((e) => {
+            e.classList.add("Box");
+            e.classList.add("p-3");
+            e.classList.add("mt-2");
         });
         /// Apply same colors for feeds.
         followingFeedWrapper.querySelectorAll("div.Box.color-bg-overlay").forEach((e) => {
@@ -151,12 +164,6 @@
             const markdownBody = e.querySelector("div.color-fg-muted.comment-body.markdown-body");
             if (markdownBody) {
                 markdownBody.classList.remove("color-fg-muted");
-            }
-        });
-        /// Apply same foreground color for texts.
-        followingFeedWrapper.querySelectorAll(".body > div > div > div.color-fg-muted").forEach((e) => {
-            if (!e.nextElementSibling) {
-                e.querySelector("div").classList.add("color-fg-default");
             }
         });
         // Saving the edited content for the cache.
