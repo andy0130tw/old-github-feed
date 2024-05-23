@@ -69,6 +69,9 @@
 
   	// !!!
     const loadingIndicator = document.createElement('div') // picker.querySelector(".loader");
+
+    // FIXME: which variable is for background color of ".feed-background" depends on theme;
+    //        it is not always "--bgColor-inset"
     loadingIndicator.style = `position: absolute;
       top: 0; left: 0; right: 0; z-index: 99;
       pointer-events: none;
@@ -76,7 +79,7 @@
       text-align: center;
       padding: 16px 0 96px;
       transition: opacity 150ms ease-out;
-      background: linear-gradient(0deg, transparent, var(--bgColor-default, var(--color-canvas-inset)) 60%);
+      background: linear-gradient(0deg, transparent, var(--bgColor-inset, var(--color-canvas-inset)) 60%);
       display: flex;
       align-items: center;
       justify-content: center;
