@@ -36,14 +36,17 @@
     const githubUid = document.querySelector('meta[name="octolytics-actor-id"]')?.content || '?'
     const dashboardCacheStorageKey = `dashboardCache:${githubUid}`
 
-    const followingFeedWrapper = document.createElement("div");
-    followingFeedWrapper.innerHTML = localStorage.getItem(dashboardCacheStorageKey) || "";
-    news.appendChild(followingFeedWrapper);
+    // !!! prevent reinitialization during navigations
+    const followingFeedWrapper = document.querySelector('#old-feed-following-feed') ?? document.createElement("div");
+    if (followingFeedWrapper.parentNode == null) {
+      followingFeedWrapper.id = 'old-feed-following-feed';
+      followingFeedWrapper.innerHTML = localStorage.getItem(dashboardCacheStorageKey) || "";
+      news.appendChild(followingFeedWrapper);
+    }
 
-    // !!!
     const existingPicker = document.querySelector('#old-feed-picker');
     const picker = existingPicker ?? document.createElement("div");
-    if (existingPicker == null) {
+    if (picker.parentNode == null) {
       news.insertBefore(picker, feedContainer);
     }
     picker.innerHTML = `
@@ -97,18 +100,19 @@
 
     const tabs = { following: followingFeedWrapper, forYou: feedContainer };
     picker.addEventListener("click", event => {
-        if (event.target.tagName !== "A") return;
+        const target = event.target.closest("a");
+        if (target == null) return;
 
         Object.entries(tabs).forEach(([name, el]) => {
-            el.style.display = name === event.target.dataset.show ? "block" : "none";
+            el.style.display = name === target.dataset.show ? "block" : "none";
         });
 
         picker.querySelectorAll(".feed-button").forEach(button => {
             button.classList.remove("selected");
         });
-        event.target.classList.add("selected");
+        target.classList.add("selected");
 
-        localStorage.setItem("dashboardActiveButton", event.target.dataset.show);
+        localStorage.setItem("dashboardActiveButton", target.dataset.show);
     });
     picker.querySelector(`[data-show=${localStorage.getItem("dashboardActiveButton") || "following"}]`).click();
 
