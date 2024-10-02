@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         Old Feed
 // @namespace    https://gerritbirkeland.com/
-// @version      0.14
-// @updateURL    https://raw.githubusercontent.com/Gerrit0/old-github-feed/main/old-feed.user.js
-// @downloadURL  https://raw.githubusercontent.com/Gerrit0/old-github-feed/main/old-feed.user.js
+// @version      0.14-fork-andy0130tw.1
+// @updateURL    https://raw.githubusercontent.com/andy0130tw/old-github-feed/main/old-feed.user.js
+// @downloadURL  https://raw.githubusercontent.com/andy0130tw/old-github-feed/main/old-feed.user.js
 // @description  Restores the Following/For You buttons to let you pick your feed
 // @author       Gerrit Birkeland
 // @match        https://github.com/
@@ -32,15 +32,17 @@
 
     const news = document.querySelector("#dashboard .news");
 
-    // XXX: not sure if this way works on every account
-    const githubUid = document.querySelector('meta[name="octolytics-actor-id"]')?.content || '?'
-    const dashboardCacheStorageKey = `dashboardCache:${githubUid}`
+    function getDashboardCacheStorageKey(uid) {
+      return `dashboardCache:${uid ?? '?'}`;
+    }
 
     // !!! prevent reinitialization during navigations
     const followingFeedWrapper = document.querySelector('#old-feed-following-feed') ?? document.createElement("div");
     if (followingFeedWrapper.parentNode == null) {
+      // XXX: not sure if this way works on every account
+      const cacheKey = getDashboardCacheStorageKey(document.querySelector('meta[name="octolytics-actor-id"]')?.content);
       followingFeedWrapper.id = 'old-feed-following-feed';
-      followingFeedWrapper.innerHTML = localStorage.getItem(dashboardCacheStorageKey) || "";
+      followingFeedWrapper.innerHTML = localStorage.getItem(cacheKey) || "";
       news.appendChild(followingFeedWrapper);
     }
 
@@ -144,6 +146,17 @@
         followingFeedWrapper.querySelector(".ajax-pagination-btn")?.addEventListener("click", () => {
             userHasLoadedMore = true;
         });
+
+        // !!!
+        let uid
+        try {
+          const hydroView = followingFeedWrapper.querySelector('[data-repository-hovercards-enabled] > [data-hydro-view]').dataset.hydroView;
+          uid = JSON.parse(hydroView).payload.user_id;
+        } catch (e) {
+          console.warn('[old-github-feed] Failed to extract uid from dashboard feed', e);
+        }
+        const cacheKey = getDashboardCacheStorageKey(uid);
+
         // Apply pretty paddings for feeds.
         followingFeedWrapper.querySelector(".body .py-4")?.style.setProperty('padding-top', 'var(--base-size-4, 4px)', 'important');
         followingFeedWrapper.querySelectorAll(".body .py-4").forEach((e) => {
@@ -177,6 +190,6 @@
             }
         });
         // Saving the edited content for the cache.
-        localStorage.setItem(dashboardCacheStorageKey, followingFeedWrapper.innerHTML);
+        localStorage.setItem(cacheKey, followingFeedWrapper.innerHTML);
     }
 })();
