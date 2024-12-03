@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Old Feed
 // @namespace    https://gerritbirkeland.com/
-// @version      0.14.0-fork-andy0130tw.1
+// @version      0.14.0-fork-andy0130tw.2
 // @updateURL    https://raw.githubusercontent.com/andy0130tw/old-github-feed/main/old-feed.user.js
 // @downloadURL  https://raw.githubusercontent.com/andy0130tw/old-github-feed/main/old-feed.user.js
 // @description  Restores the Following/For You buttons to let you pick your feed
@@ -34,6 +34,15 @@
 
     function getDashboardCacheStorageKey(uid) {
       return `dashboardCache:${uid ?? '?'}`;
+    }
+
+    function probeDataPropContainingUid() {
+      const hydroView = followingFeedWrapper.querySelector('[data-repository-hovercards-enabled] > [data-hydro-view]');
+      if (hydroView) return hydroView.dataset.hydroView;
+      const hydroClick = followingFeedWrapper.querySelector('[data-hydro-click]');
+      if (hydroClick) return hydroClick.dataset.hydroClick;
+      // not found
+      return null;
     }
 
     // !!! prevent reinitialization during navigations
@@ -150,8 +159,8 @@
         // !!!
         let uid
         try {
-          const hydroView = followingFeedWrapper.querySelector('[data-repository-hovercards-enabled] > [data-hydro-view]').dataset.hydroView;
-          uid = JSON.parse(hydroView).payload.user_id;
+          const data = probeDataPropContainingUid();
+          if (data != null) uid = JSON.parse(data).payload.user_id;
         } catch (e) {
           console.warn('[old-github-feed] Failed to extract uid from dashboard feed', e);
         }
