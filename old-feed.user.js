@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         Old Feed
 // @namespace    https://gerritbirkeland.com/
-// @version      0.14.0-fork-andy0130tw.2
+// @version      0.17.0-fork-andy0130tw.0
 // @updateURL    https://raw.githubusercontent.com/andy0130tw/old-github-feed/main/old-feed.user.js
 // @downloadURL  https://raw.githubusercontent.com/andy0130tw/old-github-feed/main/old-feed.user.js
 // @description  Restores the Following/For You buttons to let you pick your feed
 // @author       Gerrit Birkeland
 // @match        https://github.com/
 // @match        https://github.com/dashboard
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=github.com
+// @icon         https://github.com/favicon.ico
 // @grant        none
 // ==/UserScript==
 
@@ -18,6 +18,10 @@
     const feedContainer = document.querySelector("#dashboard feed-container");
     // Apparently if this isn't true, then an SSO popup is being shown, so don't do anything.
     if (!feedContainer) return;
+
+    // Remove Copilot
+    const copilot = document.querySelector(".copilotPreview__container");
+    if (copilot) copilot.remove();
 
     const columnContainer = document.querySelector(".feed-content");
     columnContainer.classList.remove("flex-justify-center");
@@ -111,8 +115,10 @@
 
     const tabs = { following: followingFeedWrapper, forYou: feedContainer };
     picker.addEventListener("click", event => {
-        const target = event.target.closest("a");
-        if (target == null) return;
+        const isChildSpanClicked = event.target.tagName === "SPAN" && event.target.parentNode.classList.contains("feed-button") && event.target.parentNode.tagName === "A"
+        let target = isChildSpanClicked ? event.target.parentNode : event.target;
+
+        if (target.tagName !== "A") return;
 
         Object.entries(tabs).forEach(([name, el]) => {
             el.style.display = name === target.dataset.show ? "block" : "none";
@@ -167,7 +173,7 @@
         const cacheKey = getDashboardCacheStorageKey(uid);
 
         // Apply pretty paddings for feeds.
-        followingFeedWrapper.querySelector(".body .py-4")?.style.setProperty('padding-top', 'var(--base-size-4, 4px)', 'important');
+        followingFeedWrapper.querySelector(".body .py-4")?.style.setProperty("padding-top", "var(--base-size-4, 4px)", "important");
         followingFeedWrapper.querySelectorAll(".body .py-4").forEach((e) => {
             e.classList.remove("py-4");
             e.classList.add("py-3");
@@ -184,7 +190,7 @@
             e.classList.add("p-3");
             e.classList.add("mt-2");
         });
-        /// Apply same colors for feeds.
+        // Apply the same colors for feeds.
         followingFeedWrapper.querySelectorAll("div.Box.color-bg-overlay").forEach((e) => {
             e.classList.remove("color-bg-overlay");
             e.classList.remove("color-shadow-medium");

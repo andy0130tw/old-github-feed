@@ -12,6 +12,18 @@ If you can't install user scripts, you can use https://github.com/dashboard-feed
 
 ## Change Log
 
+### v0.17 (2024-12-07)
+
+- Also detect/remove copilot from dashboard (@cotes2020)
+
+### v0.16 (2024-10-08)
+
+- Update favicon to use GitHub instead of Google (@xPaw)
+
+### v0.15 (2024-10-06)
+
+- Update to handle GitHub style/layout change (@KMohZaid)
+
 ### v0.14 (2024-04-27)
 
 - Add box around non-boxed feed items for consistency (@AlexV525)
